@@ -1,0 +1,360 @@
+/* Центрирование страницы */
+.auth-wrapper,
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Карточки */
+.auth-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 32px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.app-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 32px;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Форма авторизации */
+.auth-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field label {
+  font-size: 13px;
+  color: #555;
+}
+
+.field input {
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: #4caf50;
+}
+
+/* Кнопки */
+.btn-primary {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 11px;
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #43a047;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  font-size: 13px;
+  color: #d32f2f;
+  background: #fdecea;
+  padding: 8px 12px;
+  border: 1px solid #f5c6c6;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #4caf50;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #388e3c;
+}
+
+/* Шапка приложения */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: #888;
+}
+
+.app-title {
+  font-weight: bold;
+}
+
+.btn-logout {
+  background: #fff;
+  color: #666;
+  font-size: 13px;
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+}
+
+.btn-logout:hover {
+  background: #f5f5f5;
+}
+
+/* Статистика */
+.stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-num {
+  font-size: 26px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.stat-num.accent {
+  color: #4caf50;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+/* Форма добавления */
+.add-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.add-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+.add-input:focus {
+  border-color: #4caf50;
+}
+
+.btn-add {
+  background: #4caf50;
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-add:hover:not(:disabled) {
+  background: #43a047;
+}
+
+.btn-add:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Фильтры */
+.filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.filter-btn {
+  background: #fff;
+  color: #666;
+  font-size: 13px;
+  padding: 5px 12px;
+  border: 1px solid #ddd;
+}
+
+.filter-btn:hover {
+  background: #f5f5f5;
+}
+
+.filter-btn.active {
+  background: #f0f0f0;
+  color: #222;
+  border-color: #bbb;
+  font-weight: bold;
+}
+
+/* Список задач */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 40px;
+}
+
+.empty-msg {
+  color: #999;
+  font-size: 14px;
+  text-align: center;
+  padding: 28px 0;
+}
+
+/* Одна задача */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  padding: 12px 14px;
+}
+
+.task-item:hover {
+  border-color: #ccc;
+}
+
+.task-item.task-done {
+  opacity: 0.5;
+}
+
+/* Чекбокс */
+.task-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.task-item.task-done .task-check {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+.task-check:hover {
+  border-color: #4caf50;
+}
+
+/* Текст задачи */
+.task-text {
+  flex: 1;
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.task-item.task-done .task-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* Поле редактирования */
+.task-edit-input {
+  flex: 1;
+  background: transparent;
+  font-size: 15px;
+  border: none;
+  border-bottom: 1px solid #4caf50;
+  outline: none;
+  padding: 2px 0;
+}
+
+/* Кнопка удаления */
+.task-delete {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.task-item:hover .task-delete {
+  opacity: 1;
+}
+
+.task-delete:hover {
+  color: #d32f2f;
+  background: #fdecea;
+}
+
+/* Подсказка */
+.hint {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: #bbb;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .auth-card, .app-card { padding: 24px 16px; }
+  .stats { gap: 16px; }
+  .stat-num { font-size: 20px; }
+}

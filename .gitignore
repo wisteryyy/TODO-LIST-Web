@@ -1,0 +1,6 @@
+node_modules/
+todo-backend/node_modules/
+todo-frontend/node_modules/
+todo-backend/dist/
+todo-backend/todo.db
+todo-backend/.env
