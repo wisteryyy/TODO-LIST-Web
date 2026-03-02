@@ -1,17 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
+// ─── Типы ─────────────────────────────────────────────────
+type Task = {
+  id: string;
+  userId: string;
+  text: string;
+  done: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ApiResponse = {
+  token?: string;
+  error?: string;
+};
+
 // ─── API-утилиты ──────────────────────────────────────────
 const API = {
-  // Возвращает заголовок с токеном для защищённых запросов
-  headers(token) {
+  headers(token?: string): HeadersInit {
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
     };
   },
 
-  async register(username, password) {
+  async register(username: string, password: string): Promise<ApiResponse> {
     const res = await fetch('/auth/register', {
       method: 'POST',
       headers: this.headers(),
@@ -20,7 +34,7 @@ const API = {
     return res.json();
   },
 
-  async login(username, password) {
+  async login(username: string, password: string): Promise<ApiResponse> {
     const res = await fetch('/auth/login', {
       method: 'POST',
       headers: this.headers(),
@@ -29,12 +43,12 @@ const API = {
     return res.json();
   },
 
-  async getTasks(token) {
+  async getTasks(token: string): Promise<Task[]> {
     const res = await fetch('/tasks', { headers: this.headers(token) });
     return res.json();
   },
 
-  async createTask(token, text) {
+  async createTask(token: string, text: string): Promise<Task & { error?: string }> {
     const res = await fetch('/tasks', {
       method: 'POST',
       headers: this.headers(token),
@@ -43,7 +57,7 @@ const API = {
     return res.json();
   },
 
-  async updateTask(token, id, data) {
+  async updateTask(token: string, id: string, data: Partial<Task>): Promise<Task & { error?: string }> {
     const res = await fetch(`/tasks/${id}`, {
       method: 'PUT',
       headers: this.headers(token),
@@ -52,7 +66,7 @@ const API = {
     return res.json();
   },
 
-  async deleteTask(token, id) {
+  async deleteTask(token: string, id: string): Promise<void> {
     await fetch(`/tasks/${id}`, {
       method: 'DELETE',
       headers: this.headers(token),
@@ -61,14 +75,14 @@ const API = {
 };
 
 // ─── Компонент: форма входа/регистрации ───────────────────
-function AuthForm({ onAuth }) {
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+function AuthForm({ onAuth }: { onAuth: (token: string) => void }) {
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
       setError('Заполните все поля');
@@ -86,8 +100,7 @@ function AuthForm({ onAuth }) {
 
     if (data.error) {
       setError(data.error);
-    } else {
-      // Сохраняем токен в localStorage, чтобы не разлогиниваться при перезагрузке
+    } else if (data.token) {
       localStorage.setItem('token', data.token);
       onAuth(data.token);
     }
@@ -96,11 +109,6 @@ function AuthForm({ onAuth }) {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        {/* <div className="auth-logo">
-          <span className="logo-dot" />
-          TODO
-        </div> */}
-
         <h1 className="auth-title">
           {mode === 'login' ? 'Добро пожаловать' : 'Создать аккаунт'}
         </h1>
@@ -149,7 +157,14 @@ function AuthForm({ onAuth }) {
 }
 
 // ─── Компонент: одна задача ────────────────────────────────
-function TaskItem({ task, token, onUpdate, onDelete }) {
+type TaskItemProps = {
+  task: Task;
+  token: string;
+  onUpdate: (id: string, data: Partial<Task>) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+};
+
+function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
 
@@ -162,14 +177,13 @@ function TaskItem({ task, token, onUpdate, onDelete }) {
     setEditing(false);
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') saveEdit();
     if (e.key === 'Escape') { setEditText(task.text); setEditing(false); }
   };
 
   return (
     <div className={`task-item ${task.done ? 'task-done' : ''}`}>
-      {/* Чекбокс */}
       <button className="task-check" onClick={toggleDone} aria-label="Отметить">
         {task.done && (
           <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
@@ -178,7 +192,6 @@ function TaskItem({ task, token, onUpdate, onDelete }) {
         )}
       </button>
 
-      {/* Текст задачи или поле редактирования */}
       {editing ? (
         <input
           className="task-edit-input"
@@ -194,7 +207,6 @@ function TaskItem({ task, token, onUpdate, onDelete }) {
         </span>
       )}
 
-      {/* Кнопка удаления */}
       <button className="task-delete" onClick={() => onDelete(task.id)} aria-label="Удалить">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -205,13 +217,12 @@ function TaskItem({ task, token, onUpdate, onDelete }) {
 }
 
 // ─── Компонент: главная страница с задачами ───────────────
-function TodoApp({ token, onLogout }) {
-  const [tasks, setTasks] = useState([]);
+function TodoApp({ token, onLogout }: { token: string; onLogout: () => void }) {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [newText, setNewText] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all' | 'active' | 'done'
+  const [filter, setFilter] = useState<'all' | 'active' | 'done'>('all');
   const [loading, setLoading] = useState(true);
 
-  // Загружаем задачи при монтировании компонента
   const loadTasks = useCallback(async () => {
     const data = await API.getTasks(token);
     if (Array.isArray(data)) setTasks(data);
@@ -220,7 +231,7 @@ function TodoApp({ token, onLogout }) {
 
   useEffect(() => { loadTasks(); }, [loadTasks]);
 
-  const addTask = async (e) => {
+  const addTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newText.trim()) return;
     const task = await API.createTask(token, newText.trim());
@@ -230,19 +241,18 @@ function TodoApp({ token, onLogout }) {
     }
   };
 
-  const updateTask = async (id, data) => {
+  const updateTask = async (id: string, data: Partial<Task>) => {
     const updated = await API.updateTask(token, id, data);
     if (!updated.error) {
       setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
     }
   };
 
-  const deleteTask = async (id) => {
+  const deleteTask = async (id: string) => {
     await API.deleteTask(token, id);
     setTasks((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Фильтрация задач по выбранной вкладке
   const filtered = tasks.filter((t) => {
     if (filter === 'active') return !t.done;
     if (filter === 'done') return t.done;
@@ -255,17 +265,11 @@ function TodoApp({ token, onLogout }) {
   return (
     <div className="app-wrapper">
       <div className="app-card">
-
-        {/* Шапка */}
         <header className="app-header">
-          <div className="header-left">
-            {/* <span className="logo-dot" />
-            <span className="app-title">TODO</span> */}
-          </div>
+          <div className="header-left" />
           <button className="btn-logout" onClick={onLogout}>Выйти</button>
         </header>
 
-        {/* Счётчики */}
         <div className="stats">
           <div className="stat">
             <span className="stat-num">{tasks.length}</span>
@@ -281,7 +285,6 @@ function TodoApp({ token, onLogout }) {
           </div>
         </div>
 
-        {/* Форма добавления задачи */}
         <form onSubmit={addTask} className="add-form">
           <input
             className="add-input"
@@ -296,9 +299,8 @@ function TodoApp({ token, onLogout }) {
           </button>
         </form>
 
-        {/* Фильтры */}
         <div className="filters">
-          {['all', 'active', 'done'].map((f) => (
+          {(['all', 'active', 'done'] as const).map((f) => (
             <button
               key={f}
               className={`filter-btn ${filter === f ? 'active' : ''}`}
@@ -309,7 +311,6 @@ function TodoApp({ token, onLogout }) {
           ))}
         </div>
 
-        {/* Список задач */}
         <div className="task-list">
           {loading && <p className="empty-msg">Загрузка...</p>}
 
@@ -330,7 +331,6 @@ function TodoApp({ token, onLogout }) {
           ))}
         </div>
 
-        {/* Подсказка */}
         {tasks.length > 0 && (
           <p className="hint">Двойной клик по задаче — чтобы редактировать</p>
         )}
@@ -341,18 +341,14 @@ function TodoApp({ token, onLogout }) {
 
 // ─── Корневой компонент ────────────────────────────────────
 export default function App() {
-  // Берём токен из localStorage (если пользователь уже входил)
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
-
-  const handleAuth = (t) => setToken(t);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
   };
 
-  // Если токена нет — показываем форму входа, иначе — список задач
   return token
     ? <TodoApp token={token} onLogout={handleLogout} />
-    : <AuthForm onAuth={handleAuth} />;
+    : <AuthForm onAuth={setToken} />;
 }
