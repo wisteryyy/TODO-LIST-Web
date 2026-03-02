@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from '../db.js';
-import { users } from '../shema.js'
+import { users } from '../schema.js'
 
 export type User = typeof users.$inferSelect;
 

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from '../db.js';
-import { tasks } from '../shema.js';
+import { tasks } from '../schema.js';
 
 type TaskRow = typeof tasks.$inferSelect;
 
