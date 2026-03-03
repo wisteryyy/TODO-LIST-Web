@@ -1,38 +1,35 @@
-# TODO App
+# Datacenter App
 
 Fullstack приложение для управления задачами с авторизацией.
 
 **Стек:** Node.js · Express · Better-SQLite3 · Drizzle ORM · React · Vite
 
----
 
 ## Установка и запуск
 
-### 1. Клонировать репозиторий
+#### 1. Клонировать репозиторий
 
 ```bash
 git clone https://github.com/wisteryyy/TODO-LIST-Web.git
 cd TODO-LIST-Web
 ```
 
-### 2. Установить все зависимости
+#### 2. Установить все зависимости
 
 ```bash
-npm install
-npm run install:all
+npm install # npm i
 ```
 
-### 3. Создать `.env` файл в папке `todo-backend`
+#### 3. Создать `.env` файл в папке `todo-backend`
 
 ```bash
 # todo-backend/.env
 PORT=3000
 DB_PATH=./todo.db
-JWT_SECRET=ваш_секретный_ключ
-JWT_EXPIRES_IN=7d
+JWT_ACCESS_SECRET=суперкрутойсекретныйтокен
 ```
 
-### 4. Запустить проект
+#### 4. Запустить проект
 
 ```bash
 npm run dev
