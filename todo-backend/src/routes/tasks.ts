@@ -1,39 +1,53 @@
-import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth.js';
-import { createTask, getTasksByUser, updateTask, deleteTask } from '../models/task.js';
-import type { AuthRequest } from '../types.js';
+import { Router } from 'express'; // Express: создание роутера
+import { authMiddleware } from '../middleware/auth.js'; // Middleware: проверка JWT токена
+import { createTask, getTasksByUser, updateTask, deleteTask } from '../models/task.js'; // CRUD операции
+import type { AuthRequest } from '../types.js'; // Тип: запрос с userId из токена
 
+// Создаем роутер для группы марщрутов /tasks
 const router = Router();
+
+// Применяем middleware ко ВСЕМ маршрутам этого роутера
+// Без валидного JWT токена доступ к задачам запрещен
 router.use(authMiddleware);
 
+// GET /tasks - получить все задачи пользователя
 router.get('/', (req: AuthRequest, res) => {
+  // req.userId! добавлен middleware (восклицание = точно есть после auth)
   const tasks = getTasksByUser(req.userId!);
-  res.json(tasks);
+  res.json(tasks); // Автоматически стаавит Content-Type: application/json
 });
 
-router.post('/', (req: AuthRequest, res) => {
+// POST /tasks - создать новую задачу
+router.post('/', (req: AuthRequest, res) =>{
   const { text } = req.body;
   if (!text) {
-    res.status(400).json({ error: 'Text is required' });
-    return;
-  }
+    res.status(400).json({ error: 'Text is required!'});
+    return; // Чтобы не выполнять код дальше
+  };
+
+  // Создаем задачу (userId из токена, text от клиента)
   const task = createTask(req.userId!, text);
   res.status(201).json(task);
+
 });
 
+// PUT /tasks/:id - обновить задачу
 router.put('/:id', (req: AuthRequest, res) => {
+  // req.params.id - параметр из URL (тип string | undefined)
   const task = updateTask(req.params.id as string, req.userId!, req.body);
   if (!task) {
-    res.status(404).json({ error: 'Task not found' });
+    res.status(404).json({error: 'Task not found!'});
     return;
   }
   res.json(task);
 });
 
+// DELETE /tasks/:id - удалить задачу
 router.delete('/:id', (req: AuthRequest, res) => {
   const task = deleteTask(req.params.id as string, req.userId!);
+
   if (!task) {
-    res.status(404).json({ error: 'Task not found' });
+    res.status(404).json({ error: 'Task not found!'});
     return;
   }
   res.sendStatus(204);

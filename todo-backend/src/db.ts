@@ -3,17 +3,37 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema.js';
 import path from 'path';
 
+
+/** Определяем путь к файлу базы данных
+ * Если задана переменная окружения DB_PATH → используем её
+ * Иначе → используем файл todo.db в корне проекта
+ * - Переменная окружения: для production (можно указать /var/data/todo.db)
+ * - Файл по умолчанию: для локальной разработки (todo.db в проекте)
+ * - path.resolve(): превращает относительный путь в абсолютный
+ */
 const dbPath = process.env.DB_PATH
   ? path.resolve(process.env.DB_PATH)
   : path.resolve('todo.db');
 
 const sqlite = new Database(dbPath);
 
+/**
+ * PRAGMA: команды настройки SQLite на низком уровне для изменения поведения движка
+ * Выполняются ДО любых запросов к БД; и влияют на производительность, целостность, безопасность
+ */
 // WAL-режим ускоряет запись, foreign_keys включает каскадное удаление
 sqlite.pragma('journal_mode = WAL');
 sqlite.pragma('foreign_keys = ON');
 
-// db — основной объект для выполнения типизированных запросов через Drizzle
+/** Создаём типизированный объект db для работы с БД через Drizzle
+ * 1. drizzle() обёртывает sqlite подключение в ORM интерфейс
+ * 2. Подключает схему (schema) для типизации запросов
+ * 3. Возвращает объект с методами: select, insert, update, delete
+  * Зачем DRIZZLE после RAW SQL:
+ * - initDB() использует raw SQL для создания таблиц (миграции)
+ * - db объект используется для CRUD операций (запросы)
+ * - Drizzle даёт типобезопасность, raw SQL даёт контроль
+ */
 export const db = drizzle(sqlite, { schema });
 
 // Создаём таблицы при первом запуске (если не существуют)
