@@ -1,5 +1,5 @@
 // Маршруты аутентификации (Register, Login, Refresh, Logout)
-import { Router } from 'express'; // Express: создание роутера
+import { Router, type Request, type Response } from 'express'; // Express: создание роутера
 import type { AuthRequest } from '../types.js'; // Тип: запрос с userId
 import { createUser, findUserByUsername, verifyPassword } from '../models/user.js'; // Пользователи
 import { authMiddleware } from '../middleware/auth.js'; // Middleware: проверка JWT
@@ -40,7 +40,7 @@ const COOKIE_OPTIONS = {
 
 
 // POST /auth/register — Регистрация нового пользователя
-router.post('/register', async (req, res) => {
+router.post('/register', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   // Валидация: обязательные поля
@@ -101,7 +101,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /auth/login — Вход пользователя
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   // Валидация: обязательные поля и типы
@@ -163,10 +163,10 @@ router.post('/login', async (req, res) => {
  * - Старый токен инвалидируется (удаляется из БД)
  * - Если старый токен используется снова → возможная кража → отозвать все сессии
  */
-router.post('/refresh', async (req, res) => {
+  router.post('/refresh', async (req: Request, res: Response) => {
   // Cookie отправляются браузером автоматически (SameSite позволяет)
   const refreshToken = req.cookies?.refreshToken as string | undefined;
-  const userId       = req.cookies?.userId as string | undefined;
+  const userId = req.cookies?.userId as string | undefined;
 
   if (!refreshToken || !userId) {
     res.status(401).json({ error: 'Refresh token missing' });
@@ -208,7 +208,7 @@ router.post('/refresh', async (req, res) => {
 });
 
 // POST /auth/logout — Выход (текущая сессия)
-router.post('/logout', authMiddleware, async (req: AuthRequest, res) => {
+router.post('/logout', authMiddleware, async (req: AuthRequest, res: Response) => {
   const refreshToken = req.cookies?.refreshToken as string | undefined;
   const userId = req.userId!;
 
@@ -226,7 +226,7 @@ router.post('/logout', authMiddleware, async (req: AuthRequest, res) => {
 });
 
 // POST /auth/logout-all — Выход со всех устройств
-router.post('/logout-all', authMiddleware, (req: AuthRequest, res) => {
+router.post('/logout-all', authMiddleware, async (req: AuthRequest, res: Response) => {
   // Удаляем ВСЕ refresh токены пользователя
   deleteAllUserTokens(req.userId!);
   

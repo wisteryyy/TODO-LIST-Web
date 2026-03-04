@@ -7,11 +7,20 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 // При использовании с .default() передаёт выражение в миграцию
 import { sql } from "drizzle-orm";
 
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  SUPER_ADMIN = 'super_admin'
+}
+
 // Таблица пользователей
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(), // UUID строкой | Drizzle: первичный ключ (автоматически UNIQUE + NOT NULL)
   username: text('username').notNull().unique(), // Уникальный логин | Drizzle: NOT NULL + UNIQUE индекс
   passwordHash: text('passwordHash').notNull(), // Хэш пароля (не сам пароль!) | Drizzle: NOT NULL
+  role: text('role', { enum: ['user', 'admin', 'super_admin'] })
+    .notNull()
+    .default('user'),
   createdAt: text('createdAt').default(sql`CURRENT_TIMESTAMP`), // SQLite: дефолт через sql-тег Drizzle
 })
 

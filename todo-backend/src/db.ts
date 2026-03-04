@@ -43,6 +43,7 @@ export const initDB = () => {
       id           TEXT PRIMARY KEY,
       username     TEXT NOT NULL UNIQUE,
       passwordHash TEXT NOT NULL,
+      role         TEXT DEFAULT 'user' NOT NULL,
       createdAt    TEXT DEFAULT CURRENT_TIMESTAMP
     );
 

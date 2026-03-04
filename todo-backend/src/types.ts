@@ -1,9 +1,20 @@
 import type { Request } from 'express';
+import { UserRole } from './schema.js';
+
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+      userRole?: UserRole;
+    }
+  }
+}
 
 export type User = {
   id: string;
   username: string;
   passwordHash: string;
+  role: string;
   createdAt: string;
 };
 
@@ -18,14 +29,10 @@ export type Task = {
 
 // Payload, который хранится внутри Access Token
 export type JwtPayload = {
-  sub: string;    // userId
+  sub: string;
   iat?: number;
   exp?: number;
 };
 
-// Расширяем стандартный тип Request из Express:
-// добавляем поле userId, которое middleware записывает после проверки токена.
-// Знак ? означает, что поле может отсутствовать (до проверки токена)
-export type AuthRequest = Request & {
-  userId?: string;
-};
+// AuthRequest теперь просто алиас для Request (поля уже встроены через augmentation выше)
+export type { Request as AuthRequest } from 'express';

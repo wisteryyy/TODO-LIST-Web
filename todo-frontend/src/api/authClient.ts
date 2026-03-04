@@ -3,7 +3,7 @@
 // При перезагрузке страницы автоматически вызывается /auth/refresh
 // (Refresh Token приходит из HttpOnly cookie браузера автоматически).
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
 class AuthClient {
   private accessToken: string | null = null;

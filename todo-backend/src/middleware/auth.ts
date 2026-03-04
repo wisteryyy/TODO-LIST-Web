@@ -1,8 +1,11 @@
 import { verifyAccessToken } from '../services/tokenService.js';
-import type { Response, NextFunction } from 'express';
-import type { AuthRequest } from '../types.js';
+import type { Request, Response, NextFunction } from 'express';
+import { UserRole } from '../schema.js';
+import { db } from '../db.js';
+import { users } from '../schema.js';
+import { eq } from 'drizzle-orm';
 
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const header = req.headers.authorization;
 
   if (!header?.startsWith('Bearer ')) {
@@ -15,6 +18,15 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   try {
     const payload = verifyAccessToken(token);
     req.userId = payload.sub;
+
+    const user = db.select().from(users).where(eq(users.id, req.userId)).get();
+
+    if (!user) {
+      res.status(401).json({ error: 'User not found' });
+      return;
+    }
+
+    req.userRole = user.role as UserRole;
     next();
   } catch (err: any) {
     if (err.message === 'ACCESS_TOKEN_EXPIRED') {

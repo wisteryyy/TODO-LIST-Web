@@ -196,27 +196,38 @@ function TodoApp({ onLogout }: { onLogout: () => void }) {
     if (!newText.trim()) return;
     try {
       const task = await api.createTask(newText.trim());
-      if (!task.error) {
+      // Проверяем что ответ — задача, а не ошибка
+      if (task && !task.error) {
         setTasks((prev) => [task, ...prev]);
         setNewText('');
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error('Ошибка создания задачи:', err);
+    }
   };
 
   const updateTask = async (id: string, data: Partial<Task>) => {
     try {
       const updated = await api.updateTask(id, data);
-      if (!updated.error) {
+      // Проверяем что сервер вернул задачу без ошибки
+      if (updated && !updated.error) {
         setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
       }
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.error('Ошибка обновления задачи:', err);
+    }
   };
 
   const deleteTask = async (id: string) => {
     try {
-      await api.deleteTask(id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } catch { /* ignore */ }
+      const res = await api.deleteTask(id);
+      // Сервер возвращает 204 No Content при успехе
+      if (res.ok) {
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+      }
+    } catch (err) {
+      console.error('Ошибка удаления задачи:', err);
+    }
   };
 
   const filtered = tasks.filter((t) => {
@@ -319,7 +330,7 @@ export default function App() {
     setIsAuthed(false);
   };
 
-  // При первой загрузке пробуем тихо обновить сессию через RT cookie.
+  // При первой загрузке тихо пробуем восстановить сессию через RT cookie
   // Если cookie нет или истёк — покажем форму входа.
   useEffect(() => {
     authClient.refresh().then((ok) => {

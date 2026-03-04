@@ -8,7 +8,6 @@ import type { JwtPayload } from '../types.js';
 
 // ─── Конфигурация ──────────────────────────────────────────────────────────────
 const ACCESS_SECRET  = process.env.JWT_ACCESS_SECRET! || "development_access_secret"; // Секрет для Access Token (JWT) — должен быть сложным и храниться в .env
-// const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET! || "development_refresh_secret"; // Секрет для Refresh Token (JWT) — должен быть сложным и храниться в .env
 const ACCESS_EXPIRES  = '15m';
 const REFRESH_EXPIRES_MS = 30 * 24 * 60 * 60 * 1000; // 30 дней в мс
 
